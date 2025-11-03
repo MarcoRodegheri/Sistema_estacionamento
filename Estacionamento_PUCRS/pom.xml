@@ -4,8 +4,8 @@
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>tf.poo</groupId>
-  <artifactId>Trabalho_Final</artifactId>
+  <groupId>PUCRS_Estacionamento.TF</groupId>
+  <artifactId>Estacionamento_PUCRS</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 

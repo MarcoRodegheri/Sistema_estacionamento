@@ -1,4 +1,4 @@
-package tf.poo;
+package PUCRS_Estacionamento.TF;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
