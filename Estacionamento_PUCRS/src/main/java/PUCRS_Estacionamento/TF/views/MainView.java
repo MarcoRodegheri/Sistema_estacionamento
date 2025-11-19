@@ -39,10 +39,6 @@ public class MainView extends VerticalLayout {
         setPadding(true);
         getStyle().set("background", "linear-gradient(45deg, #ffffff 0%, #e6f7ff 100%)");
 
-       
-        long totalClientes = ger.getTodosClientes().size();
-        long totalVeiculos = ger.getTotalVeiculosNoEstacionamento();
-
         
         H1 titulo = new H1("Sistema de Estacionamento - PUCRS");
         titulo.getStyle().set("color", "#001ba6").set("margin-top", "10px").set("font-size", "1.8em");
@@ -99,7 +95,7 @@ public class MainView extends VerticalLayout {
         
         VerticalLayout c1 = new VerticalLayout();
         
-        H4 t1 = new H4("Clientes (" + totalClientes + ")"); 
+        H4 t1 = new H4("Clientes"); 
         t1.getStyle().set("color", "#001ba6").set("margin-top", "0");
 
         gridClientes.addColumn(Cliente::getNome).setHeader("Nome").setAutoWidth(true);
@@ -124,7 +120,7 @@ public class MainView extends VerticalLayout {
         
         VerticalLayout c2 = new VerticalLayout();
         
-        H4 t2 = new H4("Estacionamento (Total Registrado: " + totalVeiculos + ")"); 
+        H4 t2 = new H4("Estacionamento");
         t2.getStyle().set("color", "#d32f2f").set("margin-top", "0");
         
         gridVeiculos.addColumn(u -> {
