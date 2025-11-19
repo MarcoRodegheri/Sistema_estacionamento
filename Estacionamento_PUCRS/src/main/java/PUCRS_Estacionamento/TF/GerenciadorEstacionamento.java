@@ -205,12 +205,9 @@ public class GerenciadorEstacionamento {
         return clientes.get(cpf);
     }
 
-    public long getTotalVeiculosRegistrados() {
-
-        return clientes.values().stream()
-                .mapToLong(c -> c.getVeiculos().size())
-                .sum();
-    }
+    public int getTotalVeiculosNoEstacionamento() {
+        return veiculosEstacionados.size();
+}
 
     public Map<String, Integer> relatorioEntradasPorTipo() {
         return relatorioEntradasPorTipo(LocalDateTime.MIN, LocalDateTime.MAX);

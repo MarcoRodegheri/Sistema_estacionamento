@@ -41,7 +41,7 @@ public class MainView extends VerticalLayout {
 
        
         long totalClientes = ger.getTodosClientes().size();
-        long totalVeiculos = ger.getTotalVeiculosRegistrados();
+        long totalVeiculos = ger.getTotalVeiculosNoEstacionamento();
 
         
         H1 titulo = new H1("Sistema de Estacionamento - PUCRS");
