@@ -90,7 +90,7 @@ public class MainView extends VerticalLayout {
         card.getStyle().set("background", "white").set("border-radius", "10px")
             .set("box-shadow", "0 2px 8px rgba(0,0,0,0.1)").set("margin-top", "20px");
 
-        H3 tituloLog = new H3("📊 Painel de Controle");
+        H3 tituloLog = new H3("Painel de Controle");
         tituloLog.getStyle().set("color", "#333");
 
         HorizontalLayout listas = new HorizontalLayout();
@@ -99,7 +99,7 @@ public class MainView extends VerticalLayout {
         
         VerticalLayout c1 = new VerticalLayout();
         
-        H4 t1 = new H4("👥 Clientes (" + totalClientes + ")"); 
+        H4 t1 = new H4("Clientes (" + totalClientes + ")"); 
         t1.getStyle().set("color", "#001ba6").set("margin-top", "0");
 
         gridClientes.addColumn(Cliente::getNome).setHeader("Nome").setAutoWidth(true);
@@ -124,7 +124,7 @@ public class MainView extends VerticalLayout {
         
         VerticalLayout c2 = new VerticalLayout();
         
-        H4 t2 = new H4("🚗 No Pátio (Total Registrado: " + totalVeiculos + ")"); 
+        H4 t2 = new H4("Estacionamento (Total Registrado: " + totalVeiculos + ")"); 
         t2.getStyle().set("color", "#d32f2f").set("margin-top", "0");
         
         gridVeiculos.addColumn(u -> {
