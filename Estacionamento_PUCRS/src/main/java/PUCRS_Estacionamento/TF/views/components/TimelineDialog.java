@@ -17,9 +17,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * Simples diálogo que mostra um "timeline" de eventos (entradas/saídas)
- */
 public class TimelineDialog extends Dialog {
 
     private GerenciadorEstacionamento ger = GerenciadorEstacionamento.getInstance();
@@ -47,12 +44,11 @@ public class TimelineDialog extends Dialog {
 
         List<TimelineItem> items = new ArrayList<>();
 
-        // 1) Eventos de entrada para veículos atualmente no pátio
         for (UsoDeVaga u : ger.getVeiculosNoPatio()) {
-            items.add(new TimelineItem(u.getEntrada(), "ENTRADA: " + u.getPlaca() + " - Vaga: " + (u.getVaga() != null ? u.getVaga().getCpf() : "?")));
+            items.add(new TimelineItem(u.getEntrada(),
+                    "ENTRADA: " + u.getPlaca() + " - Vaga: " + (u.getVaga() != null ? u.getVaga().getCpf() : "?")));
         }
 
-        // 2) Eventos históricos (saídas) de todos os clientes
         for (var c : ger.getTodosClientes()) {
             for (UsoDeVaga u : c.getHistorico()) {
                 if (u.getSaida() != null) {
@@ -62,7 +58,6 @@ public class TimelineDialog extends Dialog {
             }
         }
 
-        // Ordena por data (desc)
         items.sort(Comparator.comparing(TimelineItem::getData).reversed());
 
         DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -82,7 +77,8 @@ public class TimelineDialog extends Dialog {
             container.add(row);
         }
 
-        if (items.isEmpty()) container.add(new H3("Sem eventos para exibir."));
+        if (items.isEmpty())
+            container.add(new H3("Sem eventos para exibir."));
     }
 
     private static class TimelineItem {
@@ -94,7 +90,12 @@ public class TimelineDialog extends Dialog {
             this.mensagem = mensagem;
         }
 
-        public LocalDateTime getData() { return data; }
-        public String getMensagem() { return mensagem; }
+        public LocalDateTime getData() {
+            return data;
+        }
+
+        public String getMensagem() {
+            return mensagem;
+        }
     }
 }

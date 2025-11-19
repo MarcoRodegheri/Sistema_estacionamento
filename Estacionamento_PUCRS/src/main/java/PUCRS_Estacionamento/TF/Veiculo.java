@@ -13,6 +13,6 @@ public class Veiculo {
 
     @Override
     public String toString() {
-        return placa; 
+        return placa;
     }
 }

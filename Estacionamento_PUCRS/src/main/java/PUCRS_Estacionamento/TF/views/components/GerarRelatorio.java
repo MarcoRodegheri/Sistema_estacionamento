@@ -17,13 +17,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class GerarRelatorio extends Dialog {
-    
+
     private GerenciadorEstacionamento ger = GerenciadorEstacionamento.getInstance();
 
     public GerarRelatorio() {
         setHeaderTitle("Relatório de Uso por Cliente");
         setWidth("500px");
-        
+
         Button btnFechar = new Button("X", e -> close());
         btnFechar.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         getHeader().add(btnFechar);
@@ -31,18 +31,18 @@ public class GerarRelatorio extends Dialog {
         VerticalLayout content = new VerticalLayout();
         content.setPadding(true);
         content.setSpacing(true);
-        
+
         ComboBox<Cliente> comboCliente = new ComboBox<>("Selecione o Cliente");
         comboCliente.setItems(ger.getTodosClientes());
         comboCliente.setItemLabelGenerator(c -> c.getNome() + " (" + c.getClass().getSimpleName() + ")");
         comboCliente.setWidthFull();
-        
+
         DatePicker dataInicio = new DatePicker("Data Início");
         dataInicio.setValue(java.time.LocalDate.now().minusDays(30));
-        
+
         DatePicker dataFim = new DatePicker("Data Fim");
         dataFim.setValue(java.time.LocalDate.now());
-        
+
         HorizontalLayout datas = new HorizontalLayout(dataInicio, dataFim);
         datas.setWidthFull();
 
@@ -53,7 +53,7 @@ public class GerarRelatorio extends Dialog {
 
         Button btnGerar = new Button("Gerar Relatório", e -> {
             Cliente c = comboCliente.getValue();
-            
+
             if (c == null || dataInicio.getValue() == null || dataFim.getValue() == null) {
                 areaResultado.setValue("Selecione cliente e datas.");
                 return;
@@ -64,41 +64,63 @@ public class GerarRelatorio extends Dialog {
 
             List<UsoDeVaga> todosUsos = new ArrayList<>(c.getHistorico());
             List<UsoDeVaga> ativos = ger.getVeiculosNoPatio().stream()
-                .filter(u -> c.possuiVeiculo(u.getPlaca()))
-                .collect(Collectors.toList());
+                    .filter(u -> c.possuiVeiculo(u.getPlaca()))
+                    .collect(Collectors.toList());
             todosUsos.addAll(ativos);
 
             List<UsoDeVaga> usosNoPeriodo = todosUsos.stream()
-                .filter(u -> u.getEntrada().isAfter(inicio) && u.getEntrada().isBefore(fim))
-                .collect(Collectors.toList());
+                    .filter(u -> u.getEntrada().isAfter(inicio) && u.getEntrada().isBefore(fim))
+                    .collect(Collectors.toList());
 
             if (usosNoPeriodo.isEmpty()) {
                 areaResultado.setValue("Nenhum registro encontrado.");
                 return;
             }
 
-            
             int qtdTotal = usosNoPeriodo.size();
             double custoTotal = 0.0;
             long totalMinutos = 0;
-            
+
             for (UsoDeVaga u : usosNoPeriodo) {
+
                 LocalDateTime dataFimCalculo;
-                
+                LocalDateTime fimDoDiaEntrada = u.getEntrada().toLocalDate().atTime(LocalTime.MAX);
+
+                double custoUso;
+
                 if (u.getSaida() != null) {
-                    
+
                     dataFimCalculo = u.getSaida();
-                    custoTotal += u.getValorPago();
                 } else {
-                    
+
                     dataFimCalculo = LocalDateTime.now();
-                    
-                    custoTotal += c.calcularValor(u, dataFimCalculo);
                 }
-                
-                totalMinutos += ChronoUnit.MINUTES.between(u.getEntrada(), dataFimCalculo);
+
+                LocalDateTime limiteCalculo = dataFimCalculo;
+
+                if (dataFimCalculo.isAfter(fimDoDiaEntrada)) {
+
+                    limiteCalculo = fimDoDiaEntrada;
+                }
+
+                long minutosCorrigidos = ChronoUnit.MINUTES.between(u.getEntrada(), limiteCalculo);
+
+                if (c instanceof Tecnopuc) {
+
+                    custoUso = (minutosCorrigidos / 60.0) * 1.50;
+                } else if (u.getSaida() != null) {
+
+                    custoUso = u.getValorPago();
+                } else {
+
+                    custoUso = c.calcularValor(u, dataFimCalculo);
+                }
+
+                custoTotal += custoUso;
+
+                totalMinutos += minutosCorrigidos;
             }
-            
+
             long horas = totalMinutos / 60;
             long minutos = totalMinutos % 60;
             String tempoFormatado = String.format("%d horas e %d minutos", horas, minutos);
@@ -108,9 +130,10 @@ public class GerarRelatorio extends Dialog {
             sb.append("=== RELATÓRIO DE USO ===\n");
             sb.append("Cliente: ").append(c.getNome()).append("\n");
             sb.append("Tipo: ").append(c.getClass().getSimpleName()).append("\n");
-            sb.append("Período: ").append(dataInicio.getValue()).append(" até ").append(dataFim.getValue()).append("\n\n");
-            
-            sb.append("📊 ESTATÍSTICAS:\n");
+            sb.append("Período: ").append(dataInicio.getValue()).append(" até ").append(dataFim.getValue())
+                    .append("\n\n");
+
+            sb.append(" ESTATÍSTICAS:\n");
             sb.append("• Total de Acessos: ").append(qtdTotal).append("\n");
             sb.append("• Tempo Total: ").append(tempoFormatado).append("\n");
             sb.append("• Custo Total: R$ ").append(String.format("%.2f", custoTotal)).append("\n");
@@ -118,7 +141,7 @@ public class GerarRelatorio extends Dialog {
 
             areaResultado.setValue(sb.toString());
         });
-        
+
         btnGerar.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         btnGerar.getStyle().set("background-color", "#001ba6").set("color", "white");
         btnGerar.setWidthFull();
@@ -126,7 +149,9 @@ public class GerarRelatorio extends Dialog {
         content.add(comboCliente, datas, btnGerar, areaResultado);
         add(content);
     }
-    
+
     @Override
-    public void open() { super.open(); }
+    public void open() {
+        super.open();
+    }
 }

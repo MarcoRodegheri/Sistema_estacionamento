@@ -56,7 +56,7 @@ public class UsoDeVaga {
 
     @Override
     public String toString() {
-        
+
         String s = "Placa: " + placa + " | Entrada: " + entrada;
         if (saida != null) {
             s += " | Saída: " + saida + " | Valor: " + valorPago;

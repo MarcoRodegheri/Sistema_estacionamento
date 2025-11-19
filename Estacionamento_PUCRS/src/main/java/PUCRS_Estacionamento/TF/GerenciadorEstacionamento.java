@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -189,7 +190,24 @@ public class GerenciadorEstacionamento {
         double valor = 0.0;
         long minutos = ChronoUnit.MINUTES.between(uso.getEntrada(), saida);
 
-        if (cliente instanceof Estudante || minutos >= 15) {
+        if (cliente instanceof Tecnopuc) {
+
+            LocalDateTime entrada = uso.getEntrada();
+            LocalDateTime fimDoDiaEntrada = entrada.toLocalDate().atTime(LocalTime.MAX);
+
+            LocalDateTime limiteCalculo = saida;
+
+            if (saida.isAfter(fimDoDiaEntrada)) {
+
+                limiteCalculo = fimDoDiaEntrada;
+            }
+
+            long minutosParaCobranca = ChronoUnit.MINUTES.between(entrada, limiteCalculo);
+
+            valor = (minutosParaCobranca / 60.0) * 1.50;
+
+        } else if (cliente instanceof Estudante || minutos >= 15) {
+
             valor = cliente.calcularValor(uso, saida);
         }
 
@@ -207,7 +225,7 @@ public class GerenciadorEstacionamento {
 
     public int getTotalVeiculosNoEstacionamento() {
         return veiculosEstacionados.size();
-}
+    }
 
     public Map<String, Integer> relatorioEntradasPorTipo() {
         return relatorioEntradasPorTipo(LocalDateTime.MIN, LocalDateTime.MAX);
@@ -221,17 +239,38 @@ public class GerenciadorEstacionamento {
 
         for (Cliente c : clientes.values()) {
             for (UsoDeVaga uso : c.getHistorico()) {
-                if (uso.getEntrada().isAfter(inicio) && uso.getEntrada().isBefore(fim)) {
-                    if (c instanceof Estudante)
-                        contador.put("Estudante", contador.get("Estudante") + 1);
-                    else if (c instanceof Tecnopuc)
-                        contador.put("Tecnopuc", contador.get("Tecnopuc") + 1);
-                    else
-                        contador.put("Pucrs", contador.get("Pucrs") + 1);
+
+                if (uso.getSaida() != null && uso.getEntrada().isAfter(inicio) && uso.getEntrada().isBefore(fim)) {
+                    contarEntrada(c, contador);
                 }
             }
         }
+
+        for (UsoDeVaga usoAtual : veiculosEstacionados.values()) {
+
+            if (usoAtual.getEntrada().isAfter(inicio) && usoAtual.getEntrada().isBefore(fim)) {
+
+                Cliente c = clientes.values().stream()
+                        .filter(cli -> cli.possuiVeiculo(usoAtual.getPlaca()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (c != null) {
+                    contarEntrada(c, contador);
+                }
+            }
+        }
+
         return contador;
+    }
+
+    private void contarEntrada(Cliente c, Map<String, Integer> contador) {
+        if (c instanceof Estudante)
+            contador.put("Estudante", contador.get("Estudante") + 1);
+        else if (c instanceof Tecnopuc)
+            contador.put("Tecnopuc", contador.get("Tecnopuc") + 1);
+        else
+            contador.put("Pucrs", contador.get("Pucrs") + 1);
     }
 
     public double relatorioReceitaMensal(int mes, int ano) {
