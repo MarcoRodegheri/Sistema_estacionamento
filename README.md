@@ -2,7 +2,7 @@
 
 # Sistema de Estacionamento da PUCRS
 
-### Trabalho Final da disciplina de Programação Orientada a Objetos (POO) — Prof. Alexandre Agustini
+### Trabalho Final da disciplina de Programação Orientada a Objetos (POO)
 
 ![Java](https://img.shields.io/badge/Java_21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Vaadin](https://img.shields.io/badge/Vaadin_24-00B4F0?style=for-the-badge&logo=vaadin&logoColor=white)
