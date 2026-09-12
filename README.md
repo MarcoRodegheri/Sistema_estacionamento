@@ -5,7 +5,6 @@
 ### Projeto Final da disciplina de Programação Orientada a Objetos (POO)
 
 ![Java](https://img.shields.io/badge/Java_21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot_3.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
 ![Vaadin](https://img.shields.io/badge/Vaadin_24-00B4F0?style=for-the-badge&logo=vaadin&logoColor=white)
 ![Maven](https://img.shields.io/badge/Maven-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)
 
@@ -15,9 +14,9 @@
 
 ## Sobre o projeto
 
-Sistema de gerenciamento de estacionamento desenvolvido como projeto final da disciplina de **Programação Orientada a Objetos (PUCRS)**. A aplicação controla o cadastro de clientes e veículos, o uso de vagas e a tarifação diferenciada conforme o tipo de cliente — aplicando na prática conceitos de herança, polimorfismo e encapsulamento.
+Sistema de gerenciamento de estacionamento desenvolvido como projeto final da disciplina de **Programação Orientada a Objetos (PUCRS)**. A aplicação controla o cadastro de clientes e veículos, o uso de vagas e a tarifação diferenciada conforme o tipo de cliente — aplicando na prática conceitos de herança, polimorfismo, encapsulamento e o padrão de projeto Singleton.
 
-O sistema possui backend em **Spring Boot** e uma interface web construída com **Vaadin**, permitindo interação direta com o gerenciador de estacionamento pelo navegador.
+O backend é implementado em **Java puro**, com toda a lógica de negócio (clientes, vagas, tarifação, histórico de uso) modelada via orientação a objetos, sem depender de um framework para as regras do domínio. A interface web é construída com **Vaadin**, que utiliza o Spring Boot internamente apenas como mecanismo de inicialização do servidor — não como camada de negócio.
 
 ## Funcionalidades
 
@@ -28,7 +27,7 @@ O sistema possui backend em **Spring Boot** e uma interface web construída com 
 - Cadastro e controle de **veículos** por cliente
 - Controle de **vagas** disponíveis e ocupadas
 - Registro de **uso de vaga** (entrada e saída), com cálculo de tempo e valor a pagar
-- Gerenciamento centralizado via `GerenciadorEstacionamento`
+- Gerenciamento centralizado via `GerenciadorEstacionamento`, implementado como **Singleton**
 
 ## Arquitetura
 
@@ -58,12 +57,8 @@ mvn spring-boot:run
 
 A aplicação sobe em `http://localhost:8080`.
 
-## 👥 Equipe — Grupo 14
+## Equipe
 
 - Marco Antônio De Carli Rodegheri
 - Luiz Henrique Saggin Confortin
 - Roger Rozales Ehlert
-
-## 🔗 Contato
-
-[LinkedIn](https://www.linkedin.com/in/marco-rodegheri/) · [marcoantoniorodegheri@gmail.com](mailto:marcoantoniorodegheri@gmail.com)
