@@ -18,7 +18,7 @@ public class OutrasConsultas extends Dialog {
     private GerenciadorEstacionamento ger = GerenciadorEstacionamento.getInstance();
 
     private TextField txtValorMedio = new TextField("Preço Médio por Uso");
-    private Grid<String> gridTop5 = new Grid<>();
+    private Grid<String> gridTop5 = new Grid<>(String.class, false);
 
     public OutrasConsultas() {
         setHeaderTitle("Consultas Especiais");
@@ -60,7 +60,7 @@ public class OutrasConsultas extends Dialog {
 
     private void carregarDados() {
         try {
-            NumberFormat format = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
+            NumberFormat format = NumberFormat.getCurrencyInstance(Locale.of("pt", "BR"));
 
             double valorMedio = ger.consultarValorMedioPorUso();
             txtValorMedio.setValue(format.format(valorMedio));

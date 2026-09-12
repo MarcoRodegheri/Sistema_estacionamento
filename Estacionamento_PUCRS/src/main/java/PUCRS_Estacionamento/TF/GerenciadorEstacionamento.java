@@ -116,10 +116,49 @@ public class GerenciadorEstacionamento {
 
     public void cadastrarCliente(Cliente novoCliente) {
         if (clientes.containsKey(novoCliente.getCpf())) {
-            clientes.put(novoCliente.getCpf(), novoCliente);
-            return;
+            throw new IllegalArgumentException("CPF já cadastrado: " + novoCliente.getCpf());
         }
         clientes.put(novoCliente.getCpf(), novoCliente);
+        salvarClientesEmArquivo();
+    }
+
+    /** Persiste todos os clientes de volta ao clientes.txt (extra: escrita em arquivo) */
+    public void salvarClientesEmArquivo() {
+        try {
+            StringBuilder sb = new StringBuilder();
+            for (Cliente c : clientes.values()) {
+                String tipo;
+                String saldo = "0";
+                if (c instanceof Estudante) {
+                    tipo = "Estudante";
+                    saldo = String.valueOf((int) ((Estudante) c).getSaldo());
+                } else if (c instanceof Tecnopuc) {
+                    tipo = "Tecnopuc";
+                } else {
+                    tipo = "Pucrs";
+                }
+                // formato: cpf,nome,telefone,saldo,tipo,placa1,placa2,...
+                sb.append(c.getCpf()).append(",")
+                  .append(c.getNome()).append(",")
+                  .append("00000000000").append(",") // telefone não é armazenado na classe, placeholder
+                  .append(saldo).append(",")
+                  .append(tipo);
+                for (Veiculo v : c.getVeiculos()) {
+                    sb.append(",").append(v.getPlaca());
+                }
+                sb.append("\n");
+            }
+            Files.write(Paths.get("clientes.txt"), sb.toString().getBytes());
+        } catch (IOException e) {
+            System.out.println("Aviso: Não foi possível salvar clientes.txt: " + e.getMessage());
+        }
+    }
+
+    /** Atualiza os veículos de um cliente existente e persiste em arquivo */
+    public void atualizarVeiculosCliente(String cpf) {
+        if (clientes.containsKey(cpf)) {
+            salvarClientesEmArquivo();
+        }
     }
 
     public String registrarEntrada(String placa, LocalDateTime dataHora) {
@@ -132,9 +171,12 @@ public class GerenciadorEstacionamento {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Placa não cadastrada!"));
 
-        for (Veiculo v : cliente.getVeiculos()) {
-            if (veiculosEstacionados.containsKey(v.getPlaca())) {
-                throw new IllegalStateException("Entrada Bloqueada: O cliente já possui outro veículo no pátio.");
+        // Tecnopuc não tem restrição de entrada (múltiplos carros simultâneos permitidos)
+        if (!(cliente instanceof Tecnopuc)) {
+            for (Veiculo v : cliente.getVeiculos()) {
+                if (veiculosEstacionados.containsKey(v.getPlaca())) {
+                    throw new IllegalStateException("Entrada Bloqueada: O cliente já possui outro veículo no pátio.");
+                }
             }
         }
 
@@ -143,9 +185,10 @@ public class GerenciadorEstacionamento {
         if (cliente instanceof Estudante) {
             Estudante est = (Estudante) cliente;
 
-            if (est.getSaldo() < -15.0) {
+            // A partir de R$ 15,00 de dívida (saldo <= -15) a entrada é recusada
+            if (est.getSaldo() <= -15.0) {
                 throw new IllegalStateException("Entrada bloqueada: Dívida de R$ "
-                        + String.format("%.2f", est.getSaldo()) + " excede o limite.");
+                        + String.format("%.2f", Math.abs(est.getSaldo())) + " excede o limite.");
             }
 
             if (est.getSaldo() < 0) {
@@ -204,10 +247,13 @@ public class GerenciadorEstacionamento {
 
             long minutosParaCobranca = ChronoUnit.MINUTES.between(entrada, limiteCalculo);
 
-            valor = (minutosParaCobranca / 60.0) * 1.50;
+            // Estadias < 15 minutos não são cobradas (regra válida para todos os tipos)
+            if (minutosParaCobranca >= 15) {
+                valor = (minutosParaCobranca / 60.0) * 1.50;
+            }
 
-        } else if (cliente instanceof Estudante || minutos >= 15) {
-
+        } else if (minutos >= 15) {
+            // Estadias < 15 minutos não são cobradas (regra válida para todos os tipos)
             valor = cliente.calcularValor(uso, saida);
         }
 

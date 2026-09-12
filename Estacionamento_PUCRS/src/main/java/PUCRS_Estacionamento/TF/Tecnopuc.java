@@ -40,6 +40,10 @@ public class Tecnopuc extends Cliente {
                 }
 
                 long minutosValidos = ChronoUnit.MINUTES.between(entrada, limiteCalculo);
+
+                // Estadias < 15 minutos não são cobradas
+                if (minutosValidos < 15) continue;
+
                 double custoCorrigido = (minutosValidos / 60.0) * 1.50;
 
                 total += custoCorrigido;
@@ -66,6 +70,10 @@ public class Tecnopuc extends Cliente {
                 }
 
                 long minutosValidos = ChronoUnit.MINUTES.between(entrada, limiteCalculo);
+
+                // Estadias < 15 minutos não são cobradas
+                if (minutosValidos < 15) continue;
+
                 double custoCorrigido = (minutosValidos / 60.0) * 1.50;
 
                 total += custoCorrigido;

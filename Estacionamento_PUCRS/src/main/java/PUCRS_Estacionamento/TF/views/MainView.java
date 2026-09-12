@@ -63,12 +63,15 @@ public class MainView extends VerticalLayout {
         Button btnOutrasConsultas = new Button("OUTRAS CONSULTAS", e -> abrirOutrasConsultas());
         estilizarBotaoUtil(btnOutrasConsultas);
 
+        Button btnTimeline = new Button("TIMELINE DE EVENTOS", e -> new TimelineDialog().open());
+        estilizarBotaoUtil(btnTimeline);
+
         HorizontalLayout layoutBotoesSuperior = new HorizontalLayout(btnCadastro, btnEntradaSaida);
         layoutBotoesSuperior.setSpacing(true);
         layoutBotoesSuperior.setJustifyContentMode(JustifyContentMode.CENTER);
 
         HorizontalLayout layoutBotaoUtil = new HorizontalLayout(btnTotalPorData, btnReceitaTotal, btnGerarRelatorio,
-                btnOutrasConsultas);
+                btnOutrasConsultas, btnTimeline);
         layoutBotaoUtil.setSpacing(true);
         layoutBotaoUtil.setJustifyContentMode(JustifyContentMode.CENTER);
 
@@ -257,8 +260,11 @@ public class MainView extends VerticalLayout {
     private void salvarCliente(Cliente c) {
         try {
             boolean jaExiste = (ger.getCliente(c.getCpf()) != null);
-            if (!jaExiste)
-                ger.cadastrarCliente(c);
+            if (!jaExiste) {
+                ger.cadastrarCliente(c); // já persiste em arquivo internamente
+            } else {
+                ger.atualizarVeiculosCliente(c.getCpf()); // persiste atualização de veículos
+            }
             Notification.show("Salvo: " + c.getNome(), 3000, Notification.Position.BOTTOM_START);
             atualizarLogs();
         } catch (Exception e) {

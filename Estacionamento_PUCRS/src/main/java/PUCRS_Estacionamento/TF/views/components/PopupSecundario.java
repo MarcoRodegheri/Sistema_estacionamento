@@ -58,6 +58,7 @@ public class PopupSecundario extends Dialog {
         adicionarBotaoFechar();
 
         txtNome.setValue(clienteParaEditar.getNome());
+        txtNome.setReadOnly(true); // dados pessoais não podem ser editados
         txtCpf.setValue(clienteParaEditar.getCpf());
         txtCpf.setReadOnly(true);
 
